@@ -1,0 +1,29 @@
+/* static/style.css */
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+h1, h2 {
+  color: #004080;
+}
+nav a {
+  margin-right: 15px;
+  text-decoration: none;
+  color: #0066cc;
+}
+nav a:hover {
+  text-decoration: underline;
+}
+table {
+  border-collapse: collapse;
+  width: 80%;
+  margin-bottom: 20px;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background-color: #eee;
+}

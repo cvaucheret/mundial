@@ -1,0 +1,13 @@
+.aider*
+# Archivos temporales de Prolog
+*.pl~
+*.swp
+*.swo
+*.bak
+*.log
+.DS_Store
+
+# Directorios de logs o temporales
+logs/
+tmp/
+.cache/
