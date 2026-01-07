@@ -11,8 +11,8 @@ http:location(static, '/static', []).
 :- http_handler(static(.), serve_files_in_directory('static'), [prefix]).
 
 
-serve_files_in_directory(Dir, Request) :-
-		http_reply_from_files(Dir, [], Request).
+%serve_files_in_directory(Dir, Request) :-
+%		http_reply_from_files(Dir, [], Request).
 
 :- dynamic partido/5.    % partido(ID, EquipoA, EquipoB, FechaHora, Estado)
 :- dynamic resultado/2.   % resultado(ID, GolesA-GolesB)
@@ -45,7 +45,7 @@ mostrar_fixture(_Req) :-
             Filas),
     reply_html_page(
       [ title('Fixture Mundial 2026'),
-        link([rel('stylesheet'), href('static\style.css')])
+        link([rel('stylesheet'), href('/static/style.css')])
       ],
       [ nav([ a(href('/'),        'Próximos'),
               a(href('/resultados'),'Resultados'),
