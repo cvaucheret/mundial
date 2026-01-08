@@ -20,21 +20,168 @@ serve_files_in_directory(Dir, Request) :-
 :- dynamic partido/5.    % partido(ID, EquipoA, EquipoB, FechaHora, Estado)
 :- dynamic resultado/2.   % resultado(ID, GolesA-GolesB)
 
+
 % ——————————————————————————————————————————————————
-% Definición de grupos y partidos con nombres bonitos
+% Definición completa de grupos A–L y partidos de fase de grupos
+% IDs 1–72
 % ——————————————————————————————————————————————————
 :- dynamic grupo/2.
-grupo('Argentina',     'A').  grupo('Arabia Saudita','A').
-grupo('Brasil',        'B').  grupo('Corea del Sur',   'B').
-grupo('España',        'C').  grupo('Japón',           'C').
-grupo('Alemania',      'D').  grupo('México',          'D').
+% Grupo A
+grupo('México','A').        grupo('Sudáfrica','A').
+grupo('Corea del Sur','A'). grupo('Europa D','A').
+% Grupo B
+grupo('Canadá','B').        grupo('Europa A','B').
+grupo('Qatar','B').         grupo('Suiza','B').
+% Grupo C
+grupo('Brasil','C').        grupo('Marruecos','C').
+grupo('Haití','C').         grupo('Escocia','C').
+% Grupo D
+grupo('Estados Unidos','D').grupo('Europa C','D').
+grupo('Australia','D').     grupo('Paraguay','D').
+% Grupo E
+grupo('Alemania','E').      grupo('Curazao','E').
+grupo('Costa de Marfil','E').grupo('Ecuador','E').
+% Grupo F
+grupo('Países Bajos','F').  grupo('Japón','F').
+grupo('Europa B','F').      grupo('Túnez','F').
+% Grupo G
+grupo('Bélgica','G').       grupo('Egipto','G').
+grupo('Irán','G').          grupo('Nueva Zelanda','G').
+% Grupo H
+grupo('España','H').        grupo('Cabo Verde','H').
+grupo('Arabia Saudita','H').grupo('Uruguay','H').
+% Grupo I
+grupo('Francia','I').       grupo('Senegal','I').
+grupo('Repechaje 2','I').   grupo('Noruega','I').
+% Grupo J
+grupo('Argentina','J').     grupo('Argelia','J').
+grupo('Austria','J').       grupo('Jordania','J').
+% Grupo K
+grupo('Portugal','K').      grupo('Repechaje 1','K').
+grupo('Uzbekistán','K').    grupo('Colombia','K').
+% Grupo L
+grupo('Inglaterra','L').    grupo('Croacia','L').
+grupo('Ghana','L').         grupo('Panamá','L').
 
-% partido(ID, EquipoA, EquipoB, FechaHora, Estado)
-% Estado = próximo | jugado
-partido(1, 'Argentina', 'Arabia Saudita', '2026-06-10 18:00', proximo).
-partido(2, 'Brasil',    'Corea del Sur',  '2026-06-11 21:00', proximo).
-partido(3, 'España',    'Japón',          '2026-06-12 18:00', proximo).
-partido(4, 'Alemania',  'México',         '2026-06-13 21:00', proximo).
+% ————————————
+% Partidos G. A (IDs 1–6)
+% ————————————
+partido(1, 'México',         'Sudáfrica',          '2026-06-11 16:00', proximo).
+partido(2, 'Corea del Sur',  'Europa D',           '2026-06-11 23:00', proximo).
+partido(3, 'Europa D',       'Sudáfrica',          '2026-06-18 13:00', proximo).
+partido(4, 'México',         'Corea del Sur',      '2026-06-18 22:00', proximo).
+partido(5, 'Europa D',       'México',             '2026-06-24 22:00', proximo).
+partido(6, 'Sudáfrica',      'Corea del Sur',      '2026-06-24 22:00', proximo).
+
+% ————————————
+% Partidos G. B (7–12)
+% ————————————
+partido(7,  'Canadá',        'Europa A',           '2026-06-12 16:00', proximo).
+partido(8,  'Qatar',         'Suiza',              '2026-06-12 16:00', proximo).
+partido(9,  'Suiza',         'Europa A',           '2026-06-18 16:00', proximo).
+partido(10, 'Canadá',        'Qatar',              '2026-06-18 19:00', proximo).
+partido(11, 'Suiza',         'Canadá',             '2026-06-24 16:00', proximo).
+partido(12, 'Europa A',      'Qatar',              '2026-06-24 16:00', proximo).
+
+% ————————————
+% Partidos G. C (13–18)
+% ————————————
+partido(13, 'Brasil',       'Marruecos',          '2026-06-13 19:00', proximo).
+partido(14, 'Haití',        'Escocia',            '2026-06-13 22:00', proximo).
+partido(15, 'Brasil',       'Haití',              '2026-06-19 19:00', proximo).
+partido(16, 'Escocia',      'Marruecos',          '2026-06-19 22:00', proximo).
+partido(17, 'Escocia',      'Brasil',             '2026-06-24 19:00', proximo).
+partido(18, 'Marruecos',    'Haití',              '2026-06-24 19:00', proximo).
+
+% ————————————
+% Partidos G. D (19–24)
+% ————————————
+partido(19, 'Estados Unidos','Europa C',         '2026-06-12 22:00', proximo).
+partido(20, 'Australia',     'Paraguay',          '2026-06-13 01:00', proximo).
+partido(21, 'Europa C',      'Paraguay',          '2026-06-19 16:00', proximo).
+partido(22, 'Estados Unidos','Australia',         '2026-06-19 01:00', proximo).
+partido(23, 'Europa C',      'Estados Unidos',    '2026-06-25 23:00', proximo).
+partido(24, 'Paraguay',      'Australia',         '2026-06-25 23:00', proximo).
+
+% ————————————
+% Partidos G. E (25–30)
+% ————————————
+partido(25, 'Alemania',      'Curazao',           '2026-06-14 14:00', proximo).
+partido(26, 'Costa de Marfil','Ecuador',          '2026-06-14 20:00', proximo).
+partido(27, 'Alemania',      'Costa de Marfil',   '2026-06-20 17:00', proximo).
+partido(28, 'Curazao',       'Ecuador',           '2026-06-20 21:00', proximo).
+partido(29, 'Ecuador',       'Alemania',          '2026-06-25 17:00', proximo).
+partido(30, 'Curazao',       'Costa de Marfil',   '2026-06-25 17:00', proximo).
+
+% ————————————
+% Partidos G. F (31–36)
+% ————————————
+partido(31, 'Países Bajos',  'Japón',             '2026-06-14 17:00', proximo).
+partido(32, 'Europa B',      'Túnez',             '2026-06-14 23:00', proximo).
+partido(33, 'Países Bajos',  'Europa B',          '2026-06-20 14:00', proximo).
+partido(34, 'Japón',         'Túnez',             '2026-06-20 01:00', proximo).
+partido(35, 'Túnez',         'Países Bajos',      '2026-06-25 20:00', proximo).
+partido(36, 'Japón',         'Europa B',          '2026-06-25 20:00', proximo).
+
+% ————————————
+% Partidos G. G (37–42)
+% ————————————
+partido(37, 'Bélgica',       'Egipto',            '2026-06-15 19:00', proximo).
+partido(38, 'Irán',          'Nueva Zelanda',     '2026-06-15 22:00', proximo).
+partido(39, 'Bélgica',       'Irán',              '2026-06-21 16:00', proximo).
+partido(40, 'Egipto',        'Nueva Zelanda',     '2026-06-21 22:00', proximo).
+partido(41, 'Nueva Zelanda','Bélgica',            '2026-06-26 00:00', proximo).
+partido(42, 'Egipto',        'Irán',              '2026-06-26 00:00', proximo).
+
+% ————————————
+% Partidos G. H (43–48)
+% ————————————
+partido(43, 'España',        'Cabo Verde',        '2026-06-15 13:00', proximo).
+partido(44, 'Arabia Saudita','Uruguay',           '2026-06-15 19:00', proximo).
+partido(45, 'España',        'Arabia Saudita',    '2026-06-21 13:00', proximo).
+partido(46, 'Cabo Verde',    'Uruguay',           '2026-06-21 19:00', proximo).
+partido(47, 'Uruguay',       'España',            '2026-06-26 21:00', proximo).
+partido(48, 'Cabo Verde',    'Arabia Saudita',    '2026-06-26 21:00', proximo).
+
+% ————————————
+% Partidos G. I (49–54)
+% ————————————
+partido(49, 'Francia',       'Senegal',           '2026-06-16 16:00', proximo).
+partido(50, 'Repechaje 2',   'Noruega',           '2026-06-16 19:00', proximo).
+partido(51, 'Francia',       'Repechaje 2',       '2026-06-22 18:00', proximo).
+partido(52, 'Noruega',       'Senegal',           '2026-06-22 21:00', proximo).
+partido(53, 'Noruega',       'Francia',           '2026-06-26 16:00', proximo).
+partido(54, 'Senegal',       'Repechaje 2',       '2026-06-26 16:00', proximo).
+
+% ————————————
+% Partidos G. J (55–60)
+% ————————————
+partido(55, 'Argentina',     'Argelia',           '2026-06-16 22:00', proximo).
+partido(56, 'Austria',       'Jordania',          '2026-06-17 01:00', proximo).
+partido(57, 'Argentina',     'Austria',           '2026-06-22 14:00', proximo).
+partido(58, 'Jordania',      'Argelia',           '2026-06-22 00:00', proximo).
+partido(59, 'Jordania',      'Argentina',         '2026-06-27 23:00', proximo).
+partido(60, 'Argelia',       'Austria',           '2026-06-27 23:00', proximo).
+
+% ————————————
+% Partidos G. K (61–66)
+% ————————————
+partido(61, 'Portugal',      'Repechaje 1',       '2026-06-17 14:00', proximo).
+partido(62, 'Uzbekistán',    'Colombia',          '2026-06-17 23:00', proximo).
+partido(63, 'Portugal',      'Uzbekistán',        '2026-06-23 14:00', proximo).
+partido(64, 'Repechaje 1',   'Colombia',          '2026-06-23 23:00', proximo).
+partido(65, 'Colombia',      'Portugal',          '2026-06-27 20:30', proximo).
+partido(66, 'Repechaje 1',   'Uzbekistán',        '2026-06-27 20:30', proximo).
+
+% ————————————
+% Partidos G. L (67–72)
+% ————————————
+partido(67, 'Inglaterra',    'Croacia',           '2026-06-17 17:00', proximo).
+partido(68, 'Ghana',         'Panamá',            '2026-06-17 20:00', proximo).
+partido(69, 'Inglaterra',    'Ghana',             '2026-06-23 17:00', proximo).
+partido(70, 'Croacia',       'Panamá',            '2026-06-23 20:00', proximo).
+partido(71, 'Panamá',        'Inglaterra',        '2026-06-27 18:00', proximo).
+partido(72, 'Croacia',       'Ghana',             '2026-06-27 18:00', proximo).
 
 %%% ––––––––––––––––––––––––––––––––––––––––––––––––
 %%% Hechos partido/5 para eliminación directa
