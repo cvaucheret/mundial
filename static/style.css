@@ -27,3 +27,38 @@ th, td {
 th {
   background-color: #eee;
 }
+
+/* Estilos para el formulario de resultados */
+.result-form {
+  background: #f9f9f9;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 300px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.result-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #333;
+}
+.result-form input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.result-form input[type="submit"] {
+  background: #0066cc;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.result-form input[type="submit"]:hover {
+  background: #005bb5;
+}
