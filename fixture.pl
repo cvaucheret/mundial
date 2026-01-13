@@ -13,7 +13,8 @@
              estado:oneof([proximo,jugado])
            ),
     resultado( id:integer,
-               goles:compound    % representamos G-A-B con un término GA-GB
+               goles:compound,    % representamos G-A-B con un término GA-GB
+               penales:compound   % representamos P-A-B con un término PA-PB
              ).
 
 :- use_module(library(http/http_server_files)).
@@ -109,12 +110,20 @@ resolver_equipo(mejor_tercero(N), Equipo) :-
   mejores_terceros(T), nth1(N,T,Equipo).
 
 resolver_equipo(ganador_partido(Id),Equipo) :-
-  partido(Id,A,B,_,jugado), resultado(Id,GA-GB),
-  ( GA>GB -> Equipo=A ; Equipo=B ).
+  partido(Id,A,B,_,jugado), resultado(Id,GA-GB,PA-PB),
+  ( GA > GB -> Equipo = A
+  ; GA < GB -> Equipo = B
+  ; PA > PB -> Equipo = A
+  ; Equipo = B
+  ).
 
 resolver_equipo(perdedor_partido(Id),Equipo) :-
-  partido(Id,A,B,_,jugado), resultado(Id,GA-GB),
-  ( GA>GB -> Equipo=B ; Equipo=A ).
+    partido(Id,A,B,_,jugado), resultado(Id,GA-GB,PA-PB),
+    ( GA > GB -> Equipo = B
+    ; GA < GB -> Equipo = A
+    ; PA > PB -> Equipo = B
+    ; Equipo = A
+    ).
 
 % Nombre final de un término (si ya es átomo, queda igual)
 nombre_equipo(E,N) :- atom(E), !, N=E.
@@ -157,6 +166,8 @@ mostrar_fixture(_Req) :-
              [ label([for(id)], 'ID partido:'), input([name(id),type(text)]), br([]),
                label([for(gola)], 'Goles Equipo A:'), input([name(gola),type(text)]), br([]),
                label([for(golb)], 'Goles Equipo B:'), input([name(golb),type(text)]), br([]),
+               label([for(pena)],  'Penales Equipo A:'), input([name(pena),type(text),value(0)]), br([]),
+               label([for(penb)],  'Penales Equipo B:'), input([name(penb),type(text),value("0")]), br([]),
                input([type(submit),value('Cargar Resultado')])
              ]),
         table([],
@@ -169,10 +180,12 @@ agregar_resultado(Request) :-
     memberchk(id=IdAtom, Params), atom_number(IdAtom, Id),
     memberchk(gola=GAAtom, Params), atom_number(GAAtom, GA),
     memberchk(golb=GBAtom, Params), atom_number(GBAtom, GB),
+    memberchk(pena=PAAtom, Params), atom_number(PAAtom, PA),
+    memberchk(penb=PBAtom, Params), atom_number(PBAtom, PB),
     retract_partido(Id, A, B,Fecha, proximo),
     nombre_equipo(A, NA),nombre_equipo(B, NB),
     assert_partido(Id, NA, NB, Fecha, jugado),
-    assert_resultado(Id, GA-GB),
+    assert_resultado(Id, GA-GB, PA-PB),
     reply_html_page(
       [ title('Resultado Cargado'),
         link([rel('stylesheet'), href('/static/style.css')])
@@ -182,14 +195,16 @@ agregar_resultado(Request) :-
         p(['Partido ', Id, ': ', A, ' ', GA, ' - ', GB, ' ', B]),
         a(href('/'), 'Volver al fixture')
       ]).
+
 mostrar_resultados(_Req) :-
   findall(html(tr([ td(ID),
                    td(A), td(B),
                    td(GA), td(GB),
+		   td(PA), td(PB),
                    td(Fecha)
                  ])),
           ( partido(ID,A,B,Fecha,jugado),
-            resultado(ID,GA-GB)
+            resultado(ID,GA-GB,PA-PB)
           ),
           Filas),
   reply_html_page(
@@ -198,7 +213,7 @@ mostrar_resultados(_Req) :-
     ],
     [ \menu ,
       h1('Resultados Registrados'),
-      table([], [ tr([th('ID'),th('A'),th('B'),th('Goles A'),th('Goles B'),th('Fecha')])|Filas ])
+      table([], [ tr([th('ID'),th('A'),th('B'),th('Goles A'),th('Goles B'),th('Pen A'),th('Pen B'),th('Fecha')])|Filas ])
     ]).
 
 % Lista de todos los grupos
@@ -209,7 +224,7 @@ grupos(Lista) :-
 estadisticas(Equipo,[PJ,PG,PE,PP,GF,GC,GD,Pts]) :-
   findall([RGA,RGB,Res],
     ( partido(Id,A,B,_,jugado),
-      resultado(Id,GA-GB),
+      resultado(Id,GA-GB,_PA-_PB),
       ( A==Equipo -> RGA=GA, RGB=GB ; B==Equipo -> RGA=GB, RGB=GA ),
       ( RGA>RGB -> Res=win
       ; RGA<RGB -> Res=loss
@@ -493,7 +508,7 @@ lista_matches([Id|T]) -->
     { partido(Id,Araw,Braw,_,Estado),
       nombre_equipo(Araw, A),
       nombre_equipo(Braw, B),
-      ( Estado == jugado, resultado(Id,GA-GB),
+      ( Estado == jugado, resultado(Id,GA-GB,_PA-_PB),
 	atom_string(GA, GAS), atom_string(GB, GBS)
       -> 	atomic_list_concat([GAS, '-', GBS], Score)
         ;  Score = 'vs'
