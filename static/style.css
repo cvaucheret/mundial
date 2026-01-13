@@ -62,3 +62,32 @@ th {
 .result-form input[type="submit"]:hover {
   background: #005bb5;
 }
+
+/* --- bracket eliminatorias --- */
+.bracket {
+  display: flex;
+  align-items: flex-start;
+  margin: 20px 0;
+}
+.bracket .round {
+  margin-right: 30px;
+}
+.bracket .round h3 {
+  text-align: center;
+  font-size: 1.1em;
+  margin-bottom: 10px;
+}
+.bracket .round .match {
+  background: #f1f1f1;
+  padding: 8px;
+  margin: 8px 0;
+  border-radius: 4px;
+  text-align: center;
+}
+.bracket .round .match .team {
+  display: block;
+}
+.bracket .round .match .score {
+  font-weight: bold;
+  margin: 4px 0;
+}
