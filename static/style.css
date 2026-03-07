@@ -14,19 +14,19 @@ nav a {
 nav a:hover {
   text-decoration: underline;
 }
-table {
-  border-collapse: collapse;
-  width: 80%;
-  margin-bottom: 20px;
-}
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
-}
-th {
-  background-color: #eee;
-}
+/* table { */
+/*   border-collapse: collapse; */
+/*   width: 80%; */
+/*   margin-bottom: 20px; */
+/* } */
+/* th, td { */
+/*   border: 1px solid #ccc; */
+/*   padding: 8px; */
+/*   text-align: center; */
+/* } */
+/* th { */
+/*   background-color: #eee; */
+/* } */
 
 /* Estilos para el formulario de resultados */
 .result-form {
@@ -66,7 +66,7 @@ th {
 /* --- bracket eliminatorias --- */
 .bracket {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-center;
   margin: 20px 0;
 }
 .bracket .round {
@@ -87,6 +87,11 @@ th {
 .bracket .round .match .team {
   display: block;
 }
+.bracket .round .match .teamg {
+    background: lightblue;
+  display: block;
+}
+
 .bracket .round .match .score {
   font-weight: bold;
   margin: 4px 0;

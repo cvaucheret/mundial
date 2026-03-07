@@ -32,6 +32,8 @@ serve_files_in_directory(Dir, Request) :-
  		http_reply_from_files(Dir, [], Request).
 
 
+	   
+     
 
 % ——————————————————————————————————————————————————
 % Definición completa de grupos A–L y partidos de fase de grupos
@@ -79,7 +81,46 @@ grupo('Ghana','L').         grupo('Panamá','L').
 %%% ––––––––––––––––––––––––––––––––––––––––––––––––
 %%% Utils para eliminación directa
 %%% ––––––––––––––––––––––––––––––––––––––––––––––––
-% Recolecta tercer lugar de cada grupo y ordena para mejores 4
+% Recolecta tercer lugar de cada grupo y ordena para mejores 8
+
+gruponumber('A',1). gruponumber('B',2). gruponumber('C',3). gruponumber('D',4).
+gruponumber('E',5). gruponumber('F',6). gruponumber('G',7). gruponumber('H',8).
+gruponumber('I',9). gruponumber('J',10). gruponumber('K',11). gruponumber('L',12).
+
+
+terceros(Grupo,EquipoResp) :-
+    member(g(Grupo,Resp),[g('E',E),g('I',I),g('A',A),g('L',L),g('G',G),g('D',D),g('B',B),g('K',K)]),
+    Terceros = [E,I,A,L,G,D,B,K],
+    Terceros ins 1..12,
+    all_distinct(Terceros),
+    E #\= 5, E #\= 7, E #\= 8, E #\= 9, E #\= 10, E #\= 11, E #\= 12,
+    %    (	E #= 1 ; E #= 2 ; E #= 3 ; E #= 4 ; E #= 6 ), % Grupo A/B/C/D/F
+    I #\= 1, I #\= 2, I #\= 5, I #\= 9, I #\= 10, I #\= 11, I #\= 12,
+    %    (	I #= 3 ; I #= 4 ; I #= 6 ; I #= 7 ; I #= 8 ), % Grupo C/D/F/G/H
+    A #\= 1, A #\= 2, A #\= 4, A #\= 7, A #\= 10, A #\= 11, A #\= 12,
+    %    (	A #= 3 ; A #= 5 ; A #= 6 ; A #= 8 ; A #= 9 ), % Grupo C/E/F/H/I 
+    L #\= 1, L #\= 2, L #\= 3, L #\= 4, L #\= 6, L #\= 7,  L #\= 12,
+    %    (	L #= 5 ; L #= 8 ; L #= 9 ; L #= 10 ; L #= 11 ), % Grupo E/H/I/J/K
+    G #\= 2, G #\= 3, G #\= 4, G #\= 6, G #\= 7, G #\= 11, G #\= 12,
+    %    (	G #= 1 ; G #= 5 ; G #= 8 ; G #= 9 ; G #= 10 ), % Grupo A/E/H/I/J
+    D #\= 1, D #\= 3, D #\= 4, D #\= 7, D #\= 8, D #\= 11, D #\= 12,
+    %(	D #= 2 ; D #= 5 ; D #= 6 ; D #= 9 ; D #= 10 ), % Grupo B/E/F/I/J
+    B #\= 1, B #\= 2, B #\= 3, B #\= 4, B #\= 8, B #\= 11, B #\= 12,
+    %    (	B #= 5 ; B #= 6 ; B #= 7 ; B #= 9 ; B #= 10 ), % Grupo E/F/G/I/J
+    K #\= 1, K #\= 2, K #\= 3, K #\= 6, K #\= 7, K #\= 8, K #\= 11,
+    %    (	K #= 4 ; K #= 5 ; K #= 9 ; K #= 10 ; K #= 12 ), % Grupo D/E/I/J/L
+    mejores_terceros(T),maplist(grupo,T,Grupos),maplist(gruponumber,Grupos,Numeros),
+    member(E,Numeros),member(I,Numeros),member(A,Numeros),
+    member(L,Numeros),member(G,Numeros),member(D,Numeros),
+    member(B,Numeros),member(K,Numeros),
+    gruponumber(Gruporesp,Resp),grupo(EquipoResp,Gruporesp),
+    member(EquipoResp,T).
+
+
+
+
+    
+
 mejores_terceros(Terceros) :-
   grupos(Grs),
   findall([Pts,GD,GF,Equipo],
@@ -107,15 +148,11 @@ resolver_equipo(segundo(G), Equipo) :-
   nth0(2, SD, [_,_,_,Equipo]).
 
 resolver_equipo(mejor_tercero(N), Equipo) :-
-  mejores_terceros(T), nth1(N,T,Equipo).
+    terceros(N,Equipo),!.
 
 resolver_equipo(ganador_partido(Id),Equipo) :-
-  partido(Id,A,B,_,jugado), resultado(Id,GA-GB,PA-PB),
-  ( GA > GB -> Equipo = A
-  ; GA < GB -> Equipo = B
-  ; PA > PB -> Equipo = A
-  ; Equipo = B
-  ).
+  ganador(Id,Equipo).
+
 
 resolver_equipo(perdedor_partido(Id),Equipo) :-
     partido(Id,A,B,_,jugado), resultado(Id,GA-GB,PA-PB),
@@ -124,6 +161,15 @@ resolver_equipo(perdedor_partido(Id),Equipo) :-
     ; PA > PB -> Equipo = B
     ; Equipo = A
     ).
+
+ganador(Id,Equipo) :-
+		partido(Id,A,B,_,jugado), resultado(Id,GA-GB,PA-PB),
+  ( GA > GB -> Equipo = A
+  ; GA < GB -> Equipo = B
+  ; PA > PB -> Equipo = A
+  ; Equipo = B
+  ).
+
 
 % Nombre final de un término (si ya es átomo, queda igual)
 nombre_equipo(E,N) :- atom(E), !, N=E.
@@ -149,29 +195,76 @@ mostrar_fixture(_Req) :-
 			     ),
 		Partidos),
     sort(4, @=<, Partidos, PartidosOrdenados),	    
-    findall(html(tr([ td(ID),
-                     td(NomA),
-                     td(NomB),
-                     td(Fecha)
-                   ])),
-            	member(partido(ID, NomA, NomB, Fecha),PartidosOrdenados),
+    findall(html([tr([onclick="document.getElementById('ed"+ID+"').style.display='block'",style("cursor:pointer")],[
+                       td(ID),
+                       td(NomA),
+                       td(NomB),
+                       td(Fecha)
+                     ]),
+		  div([id="ed"+ID,class="w3-modal "],
+		      div([class="w3-modal-content w3-animate-top w3-card-4",style('width:400px')],
+			  [
+			      header(class("w3-container w3-blue"),[
+					 span([onclick="document.getElementById('ed"+ID+"').style.display='none'",class="w3-button w3-display-topright"],"X"),
+					 h2("Cargar Resultado")
+					 ]),
+			      	        form([id="f"+ID,action('/resultar'),method('POST'),class("w3-container")],
+					     div(class="w3-section",[
+						     div([class('w3-row-padding'),style('font-size:25px')],[
+							     div(class('w3-half w3-right-align w3-margin-top'),label(b('Partido Nro:'))),
+							     div(class('w3-half '),b(input([class('w3-input'),style('width:60px'),type(text),value(ID),name(id),readonly],[])))
+							     ]),
+						div(class('w3-row-padding'),[
+							div(class('w3-half w3-margin-bottom'),
+							    [
+							    	label(b(GolesA)),
+								input([class('w3-input  w3-border w3-margin-bottom'),style('width:100px'),type(number),min(0),name(gola),value(0),required],[])
+
+							    ]),
+							div(class('w3-half w3-margin-bottom'),
+							    [
+								label(b(GolesB)),
+								input([class('w3-input  w3-border w3-margin-bottom'),style('width:100px'),type(number),min(0),name(golb),value(0),required],[])
+								])
+
+						    ]),
+												div(class('w3-row-padding'),[
+													div(class('w3-half w3-margin-bottom'),
+													    [
+					   label(b(PenalesA)),
+					   input([class('w3-input  w3-border w3-margin-bottom'),style('width:100px'),type(number),min(0),name(pena),value(0)],[])
+					   ]),
+													div(class('w3-half w3-margin-bottom'),
+													    [
+					   label(b(PenalesB)),
+					   input([class('w3-input  w3-border w3-margin-bottom'),style('width:100px'),type(number),min(0),name(penb),value(0)],[])
+													    ])
+												    ])])),
+					footer(class("w3-container w3-blue"),button([form="f"+ID,class('w3-button w3-block w3-light-blue w3-section w3-padding'),type(submit)],"CARGAR"))
+		 ]))]),
+            (	member(partido(ID, NomA, NomB, Fecha),PartidosOrdenados),
+		atomic_concat('Goles ', NomA, GolesA),
+		atomic_concat('Goles ', NomB, GolesB),
+		atomic_concat('Penales ', NomA, PenalesA),
+		atomic_concat('Penales ', NomB, PenalesB)
+	    ),
             Filas),
     reply_html_page(
-      [ title('Fixture Mundial 2026'),
-        link([rel('stylesheet'), href('/static/style.css')])
+	[  title('Fixture Mundial 2026'),
+	   \style 
       ],
       [  \menu ,
         h1('Próximos Partidos'),
-	        form([action('/resultar'),method('POST'), class('result-form')],
-             [ label([for(id)], 'ID partido:'), input([name(id),type(text)]), br([]),
-               label([for(gola)], 'Goles Equipo A:'), input([name(gola),type(text)]), br([]),
-               label([for(golb)], 'Goles Equipo B:'), input([name(golb),type(text)]), br([]),
-               label([for(pena)],  'Penales Equipo A:'), input([name(pena),type(text),value(0)]), br([]),
-               label([for(penb)],  'Penales Equipo B:'), input([name(penb),type(text),value("0")]), br([]),
-               input([type(submit),value('Cargar Resultado')])
-             ]),
-        table([],
-              [ tr([th('ID'),th('Equipo A'),th('Equipo B'),th('Fecha')]) | Filas ])
+	     %%    form([action('/resultar'),method('POST'), class('result-form')],
+             %% [ label([for(id)], 'ID partido:'), input([name(id),type(text)]), br([]),
+             %%   label([for(gola)], 'Goles Equipo A:'), input([name(gola),type(text)]), br([]),
+             %%   label([for(golb)], 'Goles Equipo B:'), input([name(golb),type(text)]), br([]),
+             %%   label([for(pena)],  'Penales Equipo A:'), input([name(pena),type(text),value(0)]), br([]),
+             %%   label([for(penb)],  'Penales Equipo B:'), input([name(penb),type(text),value("0")]), br([]),
+             %%   input([type(submit),value('Cargar Resultado')])
+             %% ]),
+        table([class('w3-table w3-striped w3-hoverable')],
+              [ tr(class('w3-light-blue'),[th('ID'),th('Equipo A'),th('Equipo B'),th('Fecha')]) | Filas ])
 
       ]).
 
@@ -187,12 +280,12 @@ agregar_resultado(Request) :-
     assert_partido(Id, NA, NB, Fecha, jugado),
     assert_resultado(Id, GA-GB, PA-PB),
     reply_html_page(
-      [ title('Resultado Cargado'),
-        link([rel('stylesheet'), href('/static/style.css')])
+	[ title('Resultado Cargado'),
+	  \style
       ],
       [  \menu ,
         h1('¡Resultado registrado!'),
-        p(['Partido ', Id, ': ', A, ' ', GA, ' - ', GB, ' ', B]),
+        p(['Partido ', Id, ': ', NA, ' ', GA, ' - ', GB, ' ', NB]),
         a(href('/'), 'Volver al fixture')
       ]).
 
@@ -208,12 +301,12 @@ mostrar_resultados(_Req) :-
           ),
           Filas),
   reply_html_page(
-    [ title('Resultados Mundial 2026'),
-      link([rel('stylesheet'), href('/static/style.css')])
+      [ title('Resultados Mundial 2026'),
+	\style 
     ],
     [ \menu ,
       h1('Resultados Registrados'),
-      table([], [ tr([th('ID'),th('A'),th('B'),th('Goles A'),th('Goles B'),th('Pen A'),th('Pen B'),th('Fecha')])|Filas ])
+      table([class('w3-table w3-striped')], [ tr(class('w3-light-blue'),[th('ID'),th('A'),th('B'),th('Goles A'),th('Goles B'),th('Pen A'),th('Pen B'),th('Fecha')])|Filas ])
     ]).
 
 % Lista de todos los grupos
@@ -223,15 +316,16 @@ grupos(Lista) :-
 % Estadísticas [PJ,PG,PE,PP,GF,GC,GD,Pts] de un Equipo
 estadisticas(Equipo,[PJ,PG,PE,PP,GF,GC,GD,Pts]) :-
   findall([RGA,RGB,Res],
-    ( partido(Id,A,B,_,jugado),
-      resultado(Id,GA-GB,_PA-_PB),
-      ( A==Equipo -> RGA=GA, RGB=GB ; B==Equipo -> RGA=GB, RGB=GA ),
-      ( RGA>RGB -> Res=win
-      ; RGA<RGB -> Res=loss
-      ; Res=tie
-      )
-    ),
-  Partidos),
+	  ( partido(Id,A,B,_,jugado),
+	    Id < 73,  % solo fase de grupos
+	    resultado(Id,GA-GB,_PA-_PB),
+	    ( A==Equipo -> RGA=GA, RGB=GB ; B==Equipo -> RGA=GB, RGB=GA ),
+	    ( RGA>RGB -> Res=win
+	    ; RGA<RGB -> Res=loss
+	    ; Res=tie
+	    )
+	  ),
+	  Partidos),
   length(Partidos,PJ),
   include([X]>>(X=[_,_,win]),  Partidos,W), length(W,PG),
   include([X]>>(X=[_,_,tie]),  Partidos,T), length(T,PE),
@@ -240,6 +334,7 @@ estadisticas(Equipo,[PJ,PG,PE,PP,GF,GC,GD,Pts]) :-
   findall(Y, member([_,Y,_],Partidos), L2), sum_list(L2,GC),
   GD is GF-GC,
   Pts is PG*3 + PE.
+
 
 
 % DCG que genera la tabla de posiciones de cada grupo
@@ -255,8 +350,8 @@ generar_tablas([G|Gs]) -->
   },
   html([
     h2(['Grupo ', G]),
-    table([class('tabla-grupo')],
-      [ tr([ th('Equipo'),th('PJ'),th('PG'),th('PE'),th('PP'),
+    table([class('w3-table w3-striped')],
+      [ tr(class('w3-light-blue'),[ th('Equipo'),th('PJ'),th('PG'),th('PE'),th('PP'),
             th('GF'),th('GC'),th('DG'),th('Pts') ])
       | \filas_estadisticas(Ordenado)
       ]
@@ -271,20 +366,34 @@ filas_estadisticas([[Pts,GD,Equipo,PJ,PG,PE,PP,GF,GC]|Rest]) -->
             td(PP), td(GF), td(GC), td(GD), td(Pts) ])),
   filas_estadisticas(Rest).
 
+style --> 
+    html(
+	[
+	link([rel('stylesheet'), href('/static/style.css')]),
+	link([rel('stylesheet'), href('https://www.w3schools.com/w3css/4/w3.css')]),
+	link([rel('stylesheet'), href('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css')])
+	]).
+
+
+
 menu -->
-    html(nav([ a(href('/'),        'Próximos'),
-            a(href('/resultados'),'Resultados'),
-            a(href('/tabla'),     'Tabla de Posiciones')
-          , a(href('/eliminatorias'), 'Eliminatorias')
-          ])).
+    html([div(class('w3-top'),div(class('w3-bar w3-blue'),[
+		 a([class('w3-bar-item w3-button'),href('/')],        'Próximos'),
+		 a([class('w3-bar-item w3-button'),href('/resultados')],'Resultados'),
+		 a([class('w3-bar-item w3-button'),href('/tabla')],     'Tabla de Posiciones'),
+		 a([class('w3-bar-item w3-button'),href('/eliminatorias')], 'Eliminatorias')
+				 ])),	'<br><br>']
+	).
 
 mostrar_tabla(_Req) :-
   grupos(Grps),
   reply_html_page(
-    [ title('Tabla de Posiciones'),
-      link([rel('stylesheet'), href('/static/style.css')])
+      [ title('Tabla de Posiciones'),
+	\style
     ],
-    [ \menu ,
+      [ \menu ,
+
+
       h1('Tabla de Posiciones por Grupo'),
       \generar_tablas(Grps)
     ]).
@@ -423,20 +532,20 @@ assert_partido(72, 'Croacia',       'Ghana',             '2026-06-27 18:00', pro
 %%% ––––––––––––––––––––––––––––––––––––––––––––––––
 % 16avos de final (IDs 73–80 según tu txt)
 assert_partido(73, ganador('A'), segundo('B'), '2026-06-28 16:00', proximo),
-assert_partido(74, ganador('E'), mejor_tercero(1), '2026-06-29 17:30', proximo),
+assert_partido(74, ganador('E'), mejor_tercero('E'), '2026-06-29 17:30', proximo),
 assert_partido(75, ganador('F'), segundo('C'), '2026-06-29 22:00', proximo),
 assert_partido(76, ganador('C'), segundo('F'), '2026-06-29 14:00', proximo),
-assert_partido(77, ganador('I'), mejor_tercero(2), '2026-06-30 18:00', proximo),
+assert_partido(77, ganador('I'), mejor_tercero('I'), '2026-06-30 18:00', proximo),
 assert_partido(78, segundo('E'), segundo('I'), '2026-06-30 14:00', proximo),
-assert_partido(79, ganador('A'), mejor_tercero(3), '2026-06-30 22:00', proximo),
-assert_partido(80, ganador('L'), mejor_tercero(4), '2026-07-01 13:00', proximo),
-assert_partido(81, ganador('D'), mejor_tercero(5), '2026-07-01 21:00', proximo),
-assert_partido(82, ganador('G'), mejor_tercero(6), '2026-07-01 13:00', proximo),
+assert_partido(79, ganador('A'), mejor_tercero('A'), '2026-06-30 22:00', proximo),
+assert_partido(80, ganador('L'), mejor_tercero('L'), '2026-07-01 13:00', proximo),
+assert_partido(81, ganador('D'), mejor_tercero('D'), '2026-07-01 21:00', proximo),
+assert_partido(82, ganador('G'), mejor_tercero('G'), '2026-07-01 13:00', proximo),
 assert_partido(83, segundo('K'), segundo('L'), '2026-07-02 20:00', proximo),
 assert_partido(84, ganador('H'), segundo('J'), '2026-07-02 16:00', proximo),
-assert_partido(85, ganador('B'), mejor_tercero(7), '2026-07-03 00:00', proximo),
+assert_partido(85, ganador('B'), mejor_tercero('B'), '2026-07-03 00:00', proximo),
 assert_partido(86, ganador('J'), segundo('H'), '2026-07-03 19:00', proximo),
-assert_partido(87, ganador('K'), mejor_tercero(8), '2026-07-03 22:30', proximo),
+assert_partido(87, ganador('K'), mejor_tercero('K'), '2026-07-03 22:30', proximo),
 assert_partido(88, segundo('D'), segundo('G'), '2026-07-03 15:00', proximo),
 
 
@@ -474,12 +583,12 @@ mostrar_eliminatorias(_Req) :-
        'Octavos'       -(89-96),
        'Cuartos'       -(97-100),
        'Semifinales'   -(101-102),
-       'Tercer puesto' -[103],
-       'Final'         -[104]
+       'Tercer puesto' -(103),
+       'Final'         -(104)
     ],
     reply_html_page(
-      [ title('Eliminatorias Mundial 2026'),
-        link([rel('stylesheet'), href('/static/style.css')])
+	[ title('Eliminatorias Mundial 2026'),
+	  \style
       ],
       [  \menu 
       , h1('Eliminatorias')
@@ -498,25 +607,37 @@ generar_eliminatorias([Nombre-(Rango)|Rest]) -->
 % Rango puede ser Start-End o lista fija [Id]
 matches(Start-End) --> !,
     { findall(Id, between(Start, End, Id), L) },
-    matches(L).
-matches(List) -->
-    { ( is_list(List) -> Ids = List ; Ids = List ) },
-    lista_matches(Ids).
+    lista_matches(L).
+matches(Id) --> !,
+    lista_matches([Id]).		
+
 
 lista_matches([]) --> [].
 lista_matches([Id|T]) -->
     { partido(Id,Araw,Braw,_,Estado),
       nombre_equipo(Araw, A),
       nombre_equipo(Braw, B),
-      ( Estado == jugado, resultado(Id,GA-GB,_PA-_PB),
+      ( Estado == jugado, resultado(Id,GA-GB,PA-PB),
 	atom_string(GA, GAS), atom_string(GB, GBS)
-      -> 	atomic_list_concat([GAS, '-', GBS], Score)
-        ;  Score = 'vs'
+      ->
+      (	  GA == GB ->
+	  atomic_list_concat([GAS,'(',PA,') - ', GBS,'(',PB,')'], Score)
+			;
+			atomic_list_concat([GAS, '-', GBS], Score)
+      ),
+      
+       ganador(Id,EquipoGanador),
+       (   EquipoGanador == A -> TeamA = teamg, TeamB = team ; TeamA = team , TeamB = teamg )
+        ;  Score = 'vs', TeamA = team, TeamB = team
       )
     },
     html(div(class(match),
-       [ span(class(team), A)
+       [ span(class(TeamA), A)
        , span(class(score), Score)
-       , span(class(team), B)
+       , span(class(TeamB), B)
        ])),
     lista_matches(T).
+
+
+
+
